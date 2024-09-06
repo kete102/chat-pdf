@@ -1,20 +1,28 @@
+/* eslint-disable react-hooks/exhaustive-deps */
+'use client'
 import { useCallback } from 'react'
-import { DropEvent, FileRejection, useDropzone } from 'react-dropzone'
+import { FileRejection, useDropzone } from 'react-dropzone'
+import { useDispatch } from 'react-redux'
+import type { AppDispatch } from '../store'
+import { setError } from '../_features/pdf/pdfSlice'
 
 interface FileType extends File {}
+
 export default function MyDropZone() {
+	// const { files } = useSelector((state: RootState) => state.pdf)
+	const dispatch = useDispatch<AppDispatch>()
+
 	const onDrop = useCallback(
 		(acceptedFile: FileType[], fileRejections: FileRejection[]) => {
-			const reader = new FileReader()
-
-			reader.onabort = () => console.log('file reading was aborted')
-			reader.onerror = () => console.log('file reading has failed')
-			reader.onload = () => {
-				const binaryStr = reader.result
-				console.log(binaryStr)
+			dispatch(setError(null))
+			if (fileRejections.length > 0) {
+				dispatch(
+					setError(
+						'El tipo de archivo no es correcto. Seleccione un archivo PDF por favor.'
+					)
+				)
 			}
-
-			reader.readAsArrayBuffer(acceptedFile)
+			//TODO: Esto deberia subirse a nuestro cloud
 		},
 		[]
 	)
