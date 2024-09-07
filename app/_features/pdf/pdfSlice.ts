@@ -1,19 +1,14 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
 
-//TODO: Hacer que solo se maneje el estado del la subida. El archivo se maneja por separado
+type statusType = 'idle' | 'UPLOADING' | 'COMPLETED' | 'FAILED'
 
-interface PdfFile {
-	file: File
-	status: 'UPLOADING' | 'COMPLETED' | 'FAILED'
-}
-
-interface PdfState {
-	files: PdfFile[]
+interface UploadState {
+	status: statusType
 	error: string | null
 }
 
-const initialState: PdfState = {
-	files: [],
+const initialState: UploadState = {
+	status: 'idle',
 	error: null,
 }
 
@@ -21,16 +16,11 @@ const pdfSlice = createSlice({
 	name: 'pdf',
 	initialState,
 	reducers: {
-		addFile(state, action: PayloadAction<File>) {
-			state.files.push({
-				file: action.payload,
-				status: 'UPLOADING',
-			})
-		},
-		removeFile(state, action: PayloadAction<File>) {
-			state.files = state.files.filter(
-				(file) => file.file !== action.payload
-			)
+		setUploadStatus(state, action: PayloadAction<statusType>) {
+			return {
+				status: action.payload,
+				error: null,
+			}
 		},
 		setError(state, action: PayloadAction<string | null>) {
 			state.error = action.payload
@@ -38,5 +28,5 @@ const pdfSlice = createSlice({
 	},
 })
 
-export const { addFile, removeFile, setError } = pdfSlice.actions
+export const { setUploadStatus, setError } = pdfSlice.actions
 export default pdfSlice.reducer

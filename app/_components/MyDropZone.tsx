@@ -4,25 +4,25 @@ import { useCallback } from 'react'
 import { FileRejection, useDropzone } from 'react-dropzone'
 import { useDispatch } from 'react-redux'
 import type { AppDispatch } from '../store'
-import { setError } from '../_features/pdf/pdfSlice'
+import { setError, setUploadStatus } from '../_features/pdf/pdfSlice'
 
 interface FileType extends File {}
 
 export default function MyDropZone() {
-	// const { files } = useSelector((state: RootState) => state.pdf)
 	const dispatch = useDispatch<AppDispatch>()
 
 	const onDrop = useCallback(
 		(acceptedFile: FileType[], fileRejections: FileRejection[]) => {
-			dispatch(setError(null))
 			if (fileRejections.length > 0) {
 				dispatch(
 					setError(
-						'El tipo de archivo no es correcto. Seleccione un archivo PDF por favor.'
+						'No se ha podido subir el archivo seleccionado. Elija un PDF válido por favor.'
 					)
 				)
 			}
-			//TODO: Esto deberia subirse a nuestro cloud
+			dispatch(setError(null))
+			// Si el archivo es correcto se sube a Cloudinary
+			dispatch(setUploadStatus('UPLOADING'))
 		},
 		[]
 	)
