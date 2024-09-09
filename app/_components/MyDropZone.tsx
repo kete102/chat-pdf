@@ -1,55 +1,63 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 'use client'
 import { useCallback } from 'react'
-import { FileRejection, useDropzone } from 'react-dropzone'
-import { useDispatch } from 'react-redux'
-import type { AppDispatch } from '../store'
-import { setError, setUploadStatus } from '../_features/pdf/pdfSlice'
+import { useDropzone } from 'react-dropzone'
 
-interface FileType extends File {}
+const acceptFilesType = {
+	'application/pdf': [],
+}
+
+const maxFileSize = 5242880
 
 export default function MyDropZone() {
-	const dispatch = useDispatch<AppDispatch>()
+	const onDrop = useCallback((acceptedFiles: File[]) => {
+		console.log(acceptedFiles)
+	}, [])
 
-	const onDrop = useCallback(
-		(acceptedFile: FileType[], fileRejections: FileRejection[]) => {
-			if (fileRejections.length > 0) {
-				dispatch(
-					setError(
-						'No se ha podido subir el archivo seleccionado. Elija un PDF válido por favor.'
-					)
-				)
-			}
-			dispatch(setError(null))
-			// Si el archivo es correcto se sube a Cloudinary
-			dispatch(setUploadStatus('UPLOADING'))
-		},
-		[]
-	)
-
-	const { getRootProps, getInputProps, isDragActive } = useDropzone({
+	const {
+		getRootProps,
+		getInputProps,
+		isDragActive,
+		isDragReject,
+		fileRejections,
+	} = useDropzone({
 		onDrop,
-		accept: {
-			'application/pdf': ['.pdf'],
-		},
-		maxFiles: 1,
-		maxSize: 5242880, // 5 MB = 5 * 1024 * 1024 bytes
+		accept: acceptFilesType,
+		minSize: 0,
+		maxSize: maxFileSize,
 	})
 
+	const isFileTooLarge =
+		fileRejections.length > 0 && fileRejections[0].file.size > maxFileSize
+
 	return (
-		<div
-			{...getRootProps()}
-			className={`p-6 border-2 border-dashed rounded-md ${isDragActive ? 'border-blue-500' : 'border-gray-300'}`}
-		>
-			<input {...getInputProps()} />
-			{isDragActive ? (
-				<p className="text-blue-500">Drop the PDF here...</p>
-			) : (
-				<p>
-					Drag and drop a PDF file here, or click to select a file
-					(Max size: 10MB)
-				</p>
-			)}
+		<div>
+			<div
+				{...getRootProps()}
+				className={`p-6 border-2 border-dashed rounded-md ${isDragActive ? 'border-blue-500' : 'border-gray-300'}`}
+			>
+				<input {...getInputProps()} />
+				{!isDragActive && (
+					<p className="text-center text-lg font-bold text-gray-600">
+						Clik here or drop a file to upload!
+					</p>
+				)}
+				{!isDragReject && isDragActive && (
+					<p className="text-center text-lg font-bold text-gray-600">
+						Drop it here!
+					</p>
+				)}
+				{isDragReject && (
+					<p className="text-center text-xl font-bold  text-red-400">
+						El tipo de archivo no es correcto!
+					</p>
+				)}
+				{isFileTooLarge && (
+					<p className="text-center text-xl font-bold text-red-400">
+						File is too large.
+					</p>
+				)}
+			</div>
 		</div>
 	)
 }

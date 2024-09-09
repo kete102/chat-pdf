@@ -10,7 +10,7 @@ export default function Home() {
 				<div className="absolute bottom-0 left-0 right-0 top-0 bg-[radial-gradient(circle_500px_at_50%_200px,#C9EBFF,transparent)]"></div>
 			</div>
 			<main className="grid place-content-center min-h-screen w-screen">
-				<h1 className="text-6xl opacity-70 font-bold text-center pb-10">
+				<h1 className="text-6xl opacity-80 font-bold text-center pb-10">
 					Chat with your PDF
 				</h1>
 				<App />
