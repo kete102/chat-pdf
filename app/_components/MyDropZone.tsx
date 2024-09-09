@@ -9,9 +9,28 @@ const acceptFilesType = {
 
 const maxFileSize = 5242880
 
+const uploadPDF = async (formData: FormData) => {
+	try {
+		const result = await fetch('/api/upload', {
+			method: 'POST',
+			body: formData,
+		})
+		const data = await result.json()
+		const { id, pages, url } = data
+		console.log(id, pages, url)
+	} catch (error) {
+		console.log(error)
+	}
+}
+
 export default function MyDropZone() {
-	const onDrop = useCallback((acceptedFiles: File[]) => {
-		console.log(acceptedFiles)
+	const handleFileSelected = useCallback((acceptedFiles: File[]) => {
+		if (acceptedFiles.length > 0) {
+			const formData = new FormData()
+			formData.append('file', acceptedFiles[0])
+			uploadPDF(formData)
+			console.log(formData)
+		}
 	}, [])
 
 	const {
@@ -21,7 +40,7 @@ export default function MyDropZone() {
 		isDragReject,
 		fileRejections,
 	} = useDropzone({
-		onDrop,
+		onDrop: handleFileSelected,
 		accept: acceptFilesType,
 		minSize: 0,
 		maxSize: maxFileSize,
